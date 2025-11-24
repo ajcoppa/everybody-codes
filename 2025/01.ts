@@ -1,16 +1,27 @@
+import { sum } from "../lib.ts";
+
 async function main() {
-    const text = await Bun.file("01-input.txt").text();
-    const [namesLine, instructionsLine] = text.split("\n\n");
-    const names = namesLine.split(",");
-    const instructionStrings = instructionsLine.split(",");
-    const instructions = instructionStrings.map(parseInstruction);
-    console.log(partOne(names, instructions));
+    const partOneText = await Bun.file("01-input.txt").text();
+    const partOneInput = parseInput(partOneText);
+    console.log(partOne(partOneInput.names, partOneInput.instructions));
+    const partTwoText = await Bun.file("01-input-2.txt").text();
+    const partTwoInput = parseInput(partTwoText);
+    console.log(partTwo(partTwoInput.names, partTwoInput.instructions));
 }
 
 function partOne(names: string[], instructions: Instruction[]): string {
     let index = 0;
     for (const instruction of instructions) {
         index = applyModifier(index, instructionToModifier(instruction), names.length);
+    }
+    return names[index];
+}
+
+function partTwo(names: string[], instructions: Instruction[]): string {
+    let index = sum(instructions.map(instructionToModifier));
+    index %= names.length;
+    if (index < 0) {
+        index += names.length;
     }
     return names[index];
 }
@@ -30,8 +41,17 @@ function instructionToModifier(instruction: Instruction): number {
     return mod * instruction.number;
 }
 
+function parseInput(text: string): { names: string[], instructions: Instruction[] } {
+    const [namesLine, instructionsLine] = text.split("\n\n");
+    const names = namesLine.split(",");
+    const instructionStrings = instructionsLine.split(",");
+    const instructions = instructionStrings.map(parseInstruction);
+    return { names, instructions };
+}
+
 function parseInstruction(instructionString: string): Instruction {
-    const [letter, numberString] = instructionString.split("");
+    const letter = instructionString[0];
+    const numberString = instructionString.slice(1);
     const direction = letter === "L" ? Direction.Left :
         letter === "R" ? Direction.Right : null;
     const number = parseInt(numberString, 10);
