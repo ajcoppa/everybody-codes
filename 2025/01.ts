@@ -7,6 +7,9 @@ async function main() {
     const partTwoText = await Bun.file("01-input-2.txt").text();
     const partTwoInput = parseInput(partTwoText);
     console.log(partTwo(partTwoInput.names, partTwoInput.instructions));
+    const partThreeText = await Bun.file("01-input-3.txt").text();
+    const partThreeInput = parseInput(partThreeText);
+    console.log(partThree(partThreeInput.names, partThreeInput.instructions));
 }
 
 function partOne(names: string[], instructions: Instruction[]): string {
@@ -26,12 +29,32 @@ function partTwo(names: string[], instructions: Instruction[]): string {
     return names[index];
 }
 
+function partThree(names: string[], instructions: Instruction[]): string {
+    for (const instruction of instructions) {
+        const firstName = names[0];
+        const index = applyModifierThree(0, instructionToModifier(instruction), names.length);
+        const newName = names[index];
+        names[0] = newName;
+        names[index] = firstName;
+    }
+    return names[0];
+}
+
 function applyModifier(index: number, modifier: number, max: number): number {
     index += modifier;
     if (index < 0) {
         index = 0;
     } else if (index >= max) {
         index = max - 1;
+    }
+    return index;
+}
+
+function applyModifierThree(index: number, modifier: number, max: number): number {
+    index += modifier;
+    index %= max;
+    if (index < 0) {
+        index += max;
     }
     return index;
 }
