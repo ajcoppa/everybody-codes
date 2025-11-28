@@ -5,6 +5,9 @@ async function main() {
     const partTwoText = await Bun.file("03-input-2.txt").text();
     const partTwoInput = parseInput(partTwoText);
     console.log(partTwo(partTwoInput));
+    const partThreeText = await Bun.file("03-input-3.txt").text();
+    const partThreeInput = parseInput(partThreeText);
+    console.log(partThree(partThreeInput));
 }
 
 function partOne(xs: number[]): number {
@@ -25,6 +28,18 @@ function partTwo(xs: number[]): number {
         if (crates === 20) return sum;
     }
     throw new Error("Didn't have enough crates");
+}
+
+function partThree(xs: number[]): number {
+    return Math.max(...countOccurrences(xs));
+}
+
+function countOccurrences(xs: number[]): number[] {
+    let occurrences: number[] = [];
+    xs.forEach(n => {
+        occurrences[n] = occurrences[n] ? occurrences[n] + 1 : 1;
+    });
+    return occurrences.filter(n => n);
 }
 
 function parseInput(text: string): number[] {
